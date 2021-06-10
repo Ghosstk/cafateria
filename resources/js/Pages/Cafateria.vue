@@ -1,14 +1,23 @@
 <template>
     <basic-layout>
         <div class="bg-white overflow-hidden rounded-lg shadow-md">
-            <div class="px-4 py-5 sm:px-6">
-                <h3 class="text-2xl leading-6 font-medium text-gray-900">
-                    Cafatéria - 2021
-                </h3>
-                <p class="mt-1 text-sm text-gray-500">
-                    <span class="font-bold">Éves keret:</span> {{ formatNumber(totalLimit) }} Ft.
-                    <span class="font-bold">Kategória keret:</span> {{ formatNumber(categoryLimit) }} Ft.
-                </p>
+            <div class="px-4 py-5">
+                <div class="-ml-4 -mt-4 flex justify-between items-center flex-wrap sm:flex-nowrap">
+                    <div class="ml-4 mt-4">
+                        <h3 class="text-2xl leading-6 font-medium text-gray-900">
+                            Cafatéria - 2021
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            <span class="font-bold">Éves keret:</span> {{ formatNumber(totalLimit) }} Ft.
+                            <span class="font-bold">Kategória keret:</span> {{ formatNumber(categoryLimit) }} Ft.
+                        </p>
+                    </div>
+                    <div class="ml-4 mt-4 flex-shrink-0">
+                        <a :href="route('cafateria.export.csv')" class="cursor-pointer relative inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <font-awesome-icon size="2x" :icon="['fas','file-csv']"/>
+                        </a>
+                    </div>
+                </div>
             </div>
             <form-error v-if="form" :errors="form.errors"></form-error>
             <form @submit.prevent="submit">

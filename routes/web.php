@@ -19,4 +19,5 @@ use Inertia\Inertia;
 Route::name('cafateria.')->group(function (){
     Route::get('/', [Controller::class,'index'])->name('index');
     Route::post('/', [Controller::class,'store'])->name('store');
+    Route::get('/csv', [Controller::class,'exportCSV'])->name('export.csv');
 });

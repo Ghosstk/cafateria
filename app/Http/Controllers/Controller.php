@@ -12,7 +12,6 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 
 class Controller extends BaseController
@@ -50,5 +49,34 @@ class Controller extends BaseController
         $action->call($request->validated());
 
         return Redirect::route('cafateria.index');
+    }
+
+    public function exportCSV()
+    {
+        $filename = "cafateria.csv";
+        $cafateria = Cafateria::with('category:id,name')->get(['month','amount','category_id']);
+
+        $downloadCallback = function () use ($cafateria){
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['Hónap','Kategória','Mennyiség']);
+
+            $date = Carbon::now()->locale('hu');
+            foreach ($cafateria as $caf){
+                fputcsv($file, [
+                    strtolower($date->month($caf['month'])->monthName),
+                    strtolower($caf['category']['name']),
+                    $caf['amount']
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($downloadCallback, 200, [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+        ]);
     }
 }
