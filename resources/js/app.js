@@ -4,14 +4,11 @@ import { createApp, h } from 'vue';
 import { App as InertiaApp, plugin as InertiaPlugin } from '@inertiajs/inertia-vue3';
 import { InertiaProgress } from '@inertiajs/progress';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBell, faBars, faTimes, faSearch} from '@fortawesome/free-solid-svg-icons';
+import { faSave} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 library.add(
-    faBell,
-    faBars,
-    faTimes,
-    faSearch
+    faSave,
 );
 
 const el = document.getElementById('app');
@@ -28,4 +25,4 @@ createApp({
     .component('font-awesome-icon', FontAwesomeIcon)
     .mount(el);
 
-InertiaProgress.init({ color: '#4B5563' });
+InertiaProgress.init({ color: '#5797ec' });
