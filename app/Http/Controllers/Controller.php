@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -19,20 +20,17 @@ class Controller extends BaseController
         $date = Carbon::now()->locale('hu');
         for ($i = 1; $i < 13; $i++){
             $date->month($i);
-            $months[] = $date->monthName;
+            $months[] = [
+                'name'  => $date->monthName,
+                'month' => $date->month
+            ];
         }
+
+        $categories = Category::all(['id','name']);
 
         return Inertia::render('Cafateria', [
             'monthNames' =>  $months,
-            'categories' => [
-                'Reggeli',
-                'Ebéd',
-                'Vacsora'
-            ]
+            'categories' => $categories
         ]);
-
-//        ['id' => 1, 'name' => 'Reggeli'],
-//                ['id' => 2, 'name' => 'Ebéd'],
-//                ['id' => 3, 'name' => 'Vacsora']
     }
 }

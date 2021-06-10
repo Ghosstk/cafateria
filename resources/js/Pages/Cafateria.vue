@@ -10,7 +10,7 @@
                     <span class="font-bold">Kategória keret:</span> {{ formatNumber(categoryLimit) }} Ft.
                 </p>
             </div>
-            <form>
+            <form @submit.prevent="submit">
                 <div class="">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -20,19 +20,19 @@
                                 <p :class="totalColor">{{formatNumber(total)}} ft</p>
                             </th>
                             <th v-for="(category, index) in categories" :key="index" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center">
-                                {{category}}
+                                {{category.name}}
                                 <p :class="categoryColor[index]">{{categoryTotal[index]}} ft</p>
                             </th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="(formRow, rowIndex) in form" :key="rowIndex" :class="rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'">
+                        <tr v-for="(monthRow, rowIndex) in form" :key="rowIndex" :class="rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'">
                             <td class="px-6 py-4 whitespace-nowrap font-lg font-bold text-gray-900 capitalize text-center">
                                 {{ monthName(rowIndex) }}
                             </td>
-                            <td v-for="(input, inputIndex) in formRow" :key="rowIndex+'-'+inputIndex" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td v-for="(categoryRow, categoryIndex) in monthRow.categories" :key="rowIndex+'-'+categoryIndex" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <div class="mt-1 relative rounded-md shadow-sm">
-                                    <input type="number" v-model.number="formRow[inputIndex]" :id="'amount-' + rowIndex + '-' + inputIndex" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-3 pr-12 sm:text-sm border-gray-300 rounded-md" placeholder="0" aria-describedby="price-currency" />
+                                    <input type="number" min="0" :max="categoryLimit" v-model.number="categoryRow.amount" :id="'amount-' + rowIndex + '-' + categoryIndex" class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-3 pr-12 sm:text-sm border-gray-300 rounded-md" placeholder="0" aria-describedby="price-currency" />
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                         <span class="text-gray-500 sm:text-sm">
                                           Ft
@@ -45,7 +45,7 @@
                     </table>
                 </div>
                 <div class="px-4 py-4 sm:px-6 flex flex-col items-center">
-                    <button @click="submit" type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         <font-awesome-icon class="mr-3" :icon="['fas','save']"/>
                         Mentés
                     </button>
@@ -81,7 +81,7 @@ export default {
             return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         },
         monthName(number){
-            return this.monthNames[number];
+            return this.monthNames[number].name;
         },
         submit()
         {
@@ -107,8 +107,8 @@ export default {
             handler: function(newValue) {
                 let total = new Array(this.categories.length).fill(0);
                 this.form.forEach((month)=>{
-                    month.forEach((category, index) => {
-                        total[index] += category;
+                    month.categories.forEach((category, index) => {
+                        total[index] += category.amount;
                     })
                 })
 
@@ -141,9 +141,22 @@ export default {
         }
     },
     created() {
-        this.form = new Array(12).fill([]);
-        this.form.forEach((value, index) => {
-            this.form[index] = new Array(this.categories.length).fill(0);
+
+        this.monthNames.forEach((month) => {
+            this.form.push({
+                month: month.month,
+                categories: []
+            })
+        })
+
+        this.form.forEach((month, index) => {
+            // this.form[index] = new Array(this.categories.length).fill(0);
+            this.categories.forEach((category) => {
+                month.categories.push({
+                    category: category.id,
+                    amount: 0
+                })
+            })
         })
     }
 }
