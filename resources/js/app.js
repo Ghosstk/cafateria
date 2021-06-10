@@ -4,11 +4,12 @@ import { createApp, h } from 'vue';
 import { App as InertiaApp, plugin as InertiaPlugin } from '@inertiajs/inertia-vue3';
 import { InertiaProgress } from '@inertiajs/progress';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSave} from '@fortawesome/free-solid-svg-icons';
+import { faSave, faExclamationTriangle} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 library.add(
     faSave,
+    faExclamationTriangle
 );
 
 const el = document.getElementById('app');

@@ -10,6 +10,7 @@
                     <span class="font-bold">Kategória keret:</span> {{ formatNumber(categoryLimit) }} Ft.
                 </p>
             </div>
+            <form-error v-if="form" :errors="form.errors"></form-error>
             <form @submit.prevent="submit">
                 <div class="">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -26,7 +27,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="(monthRow, rowIndex) in form.data()" :key="rowIndex" :class="rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'">
+                        <tr v-for="(monthRow, rowIndex) in form.data().cafateria" :key="rowIndex" :class="rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'">
                             <td class="px-6 py-4 whitespace-nowrap font-lg font-bold text-gray-900 capitalize text-center">
                                 {{ monthName(rowIndex) }}
                             </td>
@@ -57,14 +58,19 @@
 
 <script>
 import BasicLayout from "@/Layout/BasicLayout";
+import FormError from "../Partials/FormError";
+import {useForm} from "@inertiajs/inertia-vue3";
 
 export default {
     components: {
+        FormError,
         BasicLayout
     },
     props: {
         categories: Array,
-        monthNames: Array
+        monthNames: Array,
+        errors: Object,
+        cafateria: Object
     },
     data(){
         return {
@@ -73,7 +79,9 @@ export default {
             total: 0,
             categoryTotal: [],
             categoryColor: [],
-            form: []
+            form: useForm({
+                cafateria: []
+            })
         }
     },
     methods:{
@@ -84,8 +92,9 @@ export default {
             return this.monthNames[number].name;
         },
         submit() {
-            let form = this.$inertia.form(this.form);
-            form.post(route('cafateria.store'),{
+            this.form.clearErrors();
+
+            this.form.post(route('cafateria.store'),{
                 preserveScroll: true,
                 preserveState: true,
             })
@@ -110,10 +119,10 @@ export default {
         form: {
             handler: function(newValue) {
                 let total = new Array(this.categories.length).fill(0);
-                let formData = this.form.data();
+                let formData = this.form.data().cafateria;
 
                 for (let month in formData){
-                    this.form[month].categories.forEach((category, index) => {
+                    this.form.cafateria[month].categories.forEach((category, index) => {
                         total[index] += category.amount;
                     })
                 }
@@ -147,20 +156,27 @@ export default {
         }
     },
     created() {
-        let formData = [];
+        let formData = this.form.data();
+
         this.monthNames.forEach((month) => {
-            formData.push({
+            formData.cafateria.push({
                 month: month.month,
                 categories: []
             })
         })
 
-        formData.forEach((month, index) => {
+        formData.cafateria.forEach((month, index) => {
             // this.form[index] = new Array(this.categories.length).fill(0);
             this.categories.forEach((category) => {
+                let amount = 0;
+
+                if (Object.keys(this.cafateria).length && this.cafateria[month['month']+'-'+category.id]){
+                    amount = this.cafateria[month['month']+'-'+category.id]['amount'];
+                }
+
                 month.categories.push({
                     category: category.id,
-                    amount: 0
+                    amount: amount
                 })
             })
         })

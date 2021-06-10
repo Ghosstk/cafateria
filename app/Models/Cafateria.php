@@ -9,6 +9,12 @@ class Cafateria extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'month',
+        'amount',
+        'category_id',
+    ];
+
     public function category(){
         return $this->belongsTo(Category::class);
     }
