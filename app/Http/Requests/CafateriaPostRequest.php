@@ -31,31 +31,7 @@ class CafateriaPostRequest extends FormRequest
         $categoryIdsString = implode(",",$categoryIds->pluck('id')->toArray());
 
         return [
-            'cafateria' => ['required','array','size:12', function($attribute, $value, $fail){
-                $sum = 0;
-                foreach ($value as $month){
-                    foreach ($month['categories'] as $category){
-                        $sum += $category['amount'];
-                    }
-                }
-
-                if ($sum > 400000){
-                    $fail('A teljes összeg nem lehet nagyobb mint 400.000 Ft.');
-                }
-            },function($attribute, $value, $fail){
-                $sum = [];
-                foreach ($value as $month){
-                    foreach ($month['categories'] as $category){
-                        if (!isset($sum[$category['category']])) $sum[$category['category']] = 0;
-
-                        $sum[$category['category']] += $category['amount'];
-                    }
-                }
-
-                if (max($sum) > 200000){
-                    $fail('Egy kategóriában nem lehet az összeg nagyobb mint 200.000 Ft.');
-                }
-            }],
+            'cafateria' => ['required','array','size:12', $this->totalAmount() , $this->totalAmountByCategory()],
             'cafateria.*' => ['required','array:month,categories','size:2'],
             'cafateria.*.month' => ['required','numeric','between:1,12'],
             'cafateria.*.categories' => ['required','array','size:'.$categoryCounter],
@@ -67,5 +43,37 @@ class CafateriaPostRequest extends FormRequest
 
     protected function getCategoryData(){
         return Category::all('id');
+    }
+
+    protected function totalAmount(){
+        return function($attribute, $value, $fail){
+            $sum = 0;
+            foreach ($value as $month){
+                foreach ($month['categories'] as $category){
+                    $sum += $category['amount'];
+                }
+            }
+
+            if ($sum > 400000){
+                $fail('A teljes összeg nem lehet nagyobb mint 400.000 Ft.');
+            }
+        };
+    }
+
+    protected function totalAmountByCategory(){
+        return  function($attribute, $value, $fail){
+            $sum = [];
+            foreach ($value as $month){
+                foreach ($month['categories'] as $category){
+                    if (!isset($sum[$category['category']])) $sum[$category['category']] = 0;
+
+                    $sum[$category['category']] += $category['amount'];
+                }
+            }
+
+            if (max($sum) > 200000){
+                $fail('Egy kategóriában nem lehet az összeg nagyobb mint 200.000 Ft.');
+            }
+        };
     }
 }

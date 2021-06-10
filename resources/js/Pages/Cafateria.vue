@@ -62,6 +62,7 @@
                 </div>
             </form>
         </div>
+        <notification :show="success" @close="success = false"/>
     </basic-layout>
 </template>
 
@@ -69,9 +70,11 @@
 import BasicLayout from "@/Layout/BasicLayout";
 import FormError from "../Partials/FormError";
 import {useForm} from "@inertiajs/inertia-vue3";
+import Notification from "../Partials/Notification";
 
 export default {
     components: {
+        Notification,
         FormError,
         BasicLayout
     },
@@ -90,7 +93,8 @@ export default {
             categoryColor: [],
             form: useForm({
                 cafateria: []
-            })
+            }),
+            success: false
         }
     },
     methods:{
@@ -106,6 +110,7 @@ export default {
             this.form.post(route('cafateria.store'),{
                 preserveScroll: true,
                 preserveState: true,
+                onSuccess: () => this.success = true
             })
             // this.$inertia.post(,this.form);
         },

@@ -23,6 +23,7 @@ class Controller extends BaseController
         $months = [];
 
         $date = Carbon::now()->locale('hu');
+
         for ($i = 1; $i < 13; $i++){
             $date->month($i);
             $months[] = [
