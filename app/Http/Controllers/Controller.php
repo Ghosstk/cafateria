@@ -34,14 +34,14 @@ class Controller extends BaseController
 
         $categories = Category::all(['id','name']);
 
-        $cafateria = Cafateria::all(['category_id','month','amount'])->keyBy(function ($item){
+        $cafaterias = Cafateria::all(['category_id','month','amount'])->keyBy(function ($item){
            return $item->month.'-'.$item->category_id;
         });
 
         return Inertia::render('Cafateria', [
             'monthNames' =>  $months,
             'categories' => $categories,
-            'cafateria' => $cafateria
+            'cafateria' => $cafaterias
         ]);
     }
 
@@ -55,14 +55,14 @@ class Controller extends BaseController
     public function exportCSV()
     {
         $filename = "cafateria.csv";
-        $cafateria = Cafateria::with('category:id,name')->get(['month','amount','category_id']);
+        $cafaterias = Cafateria::with('category:id,name')->get(['month','amount','category_id']);
 
-        $downloadCallback = function () use ($cafateria){
+        $downloadCallback = function () use ($cafaterias){
             $file = fopen('php://output', 'w');
             fputcsv($file, ['Hónap','Kategória','Mennyiség']);
 
             $date = Carbon::now()->locale('hu');
-            foreach ($cafateria as $caf){
+            foreach ($cafaterias as $caf){
                 fputcsv($file, [
                     strtolower($date->month($caf['month'])->monthName),
                     strtolower($caf['category']['name']),
