@@ -15,4 +15,8 @@ use Inertia\Inertia;
 |
 */
 
-Route::get('/', [Controller::class,'index'])->name('cafateria.index');
+
+Route::name('cafateria.')->group(function (){
+    Route::get('/', [Controller::class,'index'])->name('index');
+    Route::post('/', [Controller::class,'store'])->name('store');
+});

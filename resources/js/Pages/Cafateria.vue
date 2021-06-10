@@ -26,7 +26,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="(monthRow, rowIndex) in form" :key="rowIndex" :class="rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'">
+                        <tr v-for="(monthRow, rowIndex) in form.data()" :key="rowIndex" :class="rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'">
                             <td class="px-6 py-4 whitespace-nowrap font-lg font-bold text-gray-900 capitalize text-center">
                                 {{ monthName(rowIndex) }}
                             </td>
@@ -45,7 +45,7 @@
                     </table>
                 </div>
                 <div class="px-4 py-4 sm:px-6 flex flex-col items-center">
-                    <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button :disabled="form.processing" type="submit" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                         <font-awesome-icon class="mr-3" :icon="['fas','save']"/>
                         Mentés
                     </button>
@@ -83,9 +83,13 @@ export default {
         monthName(number){
             return this.monthNames[number].name;
         },
-        submit()
-        {
-            console.log(this.form);
+        submit() {
+            let form = this.$inertia.form(this.form);
+            form.post(route('cafateria.store'),{
+                preserveScroll: true,
+                preserveState: true,
+            })
+            // this.$inertia.post(,this.form);
         },
         categoryColorFn(value){
             let color = {
@@ -106,11 +110,13 @@ export default {
         form: {
             handler: function(newValue) {
                 let total = new Array(this.categories.length).fill(0);
-                this.form.forEach((month)=>{
-                    month.categories.forEach((category, index) => {
+                let formData = this.form.data();
+
+                for (let month in formData){
+                    this.form[month].categories.forEach((category, index) => {
                         total[index] += category.amount;
                     })
-                })
+                }
 
                 total.forEach((value, index) => {
                     this.categoryColor[index] = this.categoryColorFn(value);
@@ -141,15 +147,15 @@ export default {
         }
     },
     created() {
-
+        let formData = [];
         this.monthNames.forEach((month) => {
-            this.form.push({
+            formData.push({
                 month: month.month,
                 categories: []
             })
         })
 
-        this.form.forEach((month, index) => {
+        formData.forEach((month, index) => {
             // this.form[index] = new Array(this.categories.length).fill(0);
             this.categories.forEach((category) => {
                 month.categories.push({
@@ -158,6 +164,8 @@ export default {
                 })
             })
         })
+
+        this.form = this.$inertia.form(formData)
     }
 }
 </script>

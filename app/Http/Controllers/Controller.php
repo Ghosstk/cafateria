@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
 
 class Controller extends BaseController
@@ -32,5 +33,10 @@ class Controller extends BaseController
             'monthNames' =>  $months,
             'categories' => $categories
         ]);
+    }
+
+    public function store(Request $request){
+
+        dump($request);
     }
 }
